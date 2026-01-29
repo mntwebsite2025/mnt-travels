@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Menu,
@@ -10,12 +10,15 @@ import {
   X,
   Mail,
   MapPin,
+  Loader2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useTheme } from "./providers/theme";
 import { useContact } from "@/hooks/use-contact";
 import Image from "next/image";
+import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 
 
 
@@ -24,10 +27,13 @@ function NavbarContent() {
   const { themeData } = useTheme();
   const { contactInfo, isLoading: contactLoading } = useContact();
   const pathname = usePathname();
+  const router = useRouter();
+  const { toast } = useToast();
   
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showFallback, setShowFallback] = useState(false);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
 
   // Add timeout for fallback data
   useEffect(() => {
@@ -69,6 +75,54 @@ function NavbarContent() {
       window.location.href = '/#quick-book-form';
     }
     setIsOpen(false);
+  };
+
+  const handleDemoLogin = async () => {
+    setIsDemoLoading(true);
+    setIsOpen(false); // Close mobile menu if open
+
+    try {
+      toast({
+        title: "Demo Login",
+        description: "Logging in with demo credentials...",
+        duration: 2000,
+      });
+      
+      const demoCredentials = {
+        email: "mnt0450@gmail.com",
+        password: "mnt@2025"
+      };
+      
+      const response = await axios.post("/api/admin/auth/login", demoCredentials);
+      
+      const { token, admin } = response.data;
+      
+      if (!token || !admin) {
+        throw new Error("Invalid response from server");
+      }
+      
+      localStorage.setItem("admin_token", token);
+      
+      toast({
+        title: "Demo Access Granted!",
+        description: "Redirecting to admin dashboard...",
+        duration: 2000,
+      });
+
+      setTimeout(() => {
+        router.push("/admin");
+      }, 1000);
+    } catch (error: any) {
+      console.error("Demo login error:", error);
+      toast({
+        variant: "destructive",
+        title: "Demo Login Failed",
+        description: "Unable to access demo account. Please try again.",
+        duration: 4000,
+      });
+    } finally {
+      setIsDemoLoading(false);
+    }
   };
 
 
@@ -245,13 +299,20 @@ function NavbarContent() {
                 WhatsApp
               </Button>
               {/* Try Demo Login Button */}
-              <Link href="/admin/login">
-                <Button
-                  className="bg-white text-gray-900 border border-gray-300 hover:bg-blue-500 hover:text-white hover:border-blue-500 px-4 xl:px-6 py-2 font-semibold text-sm xl:text-base transition-all duration-300 hover:shadow-lg hover:scale-105"
-                >
-                  Demo Login
-                </Button>
-              </Link>
+              <Button
+                onClick={handleDemoLogin}
+                disabled={isDemoLoading}
+                className="bg-white text-gray-900 border border-gray-300 hover:bg-blue-500 hover:text-white hover:border-blue-500 px-4 xl:px-6 py-2 font-semibold text-sm xl:text-base transition-all duration-300 hover:shadow-lg hover:scale-105"
+              >
+                {isDemoLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  "Try Demo"
+                )}
+              </Button>
             </div>
 
             {/* Mobile Menu Button - Responsive */}
@@ -334,14 +395,20 @@ function NavbarContent() {
                   </Button>
                   
                   {/* Try Demo Login Button - Mobile */}
-                  <Link href="/admin/login">
-                    <Button
-                      className="w-full bg-white text-gray-900 border border-gray-300 hover:bg-blue-500 hover:text-white hover:border-blue-500 py-2.5 sm:py-3 font-semibold text-sm sm:text-base transition-all duration-300 hover:shadow-lg"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Try Demo Login
-                    </Button>
-                  </Link>
+                  <Button
+                    onClick={handleDemoLogin}
+                    disabled={isDemoLoading}
+                    className="w-full bg-white text-gray-900 border border-gray-300 hover:bg-blue-500 hover:text-white hover:border-blue-500 py-2.5 sm:py-3 font-semibold text-sm sm:text-base transition-all duration-300 hover:shadow-lg"
+                  >
+                    {isDemoLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      "Try Demo Login"
+                    )}
+                  </Button>
                 </motion.div>
               </div>
             </motion.div>
