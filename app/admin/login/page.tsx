@@ -143,6 +143,55 @@ export default function AdminLogin() {
     }))
   }
 
+  const handleDemoLogin = async () => {
+    setIsLoading(true)
+
+    try {
+      toast({
+        variant: "default",
+        title: "Demo Login",
+        description: "Logging in with demo credentials...",
+        duration: 2000,
+      })
+      
+      const demoCredentials = {
+        email: "mnt0450@gmail.com",
+        password: "mnt@2025"
+      }
+      
+      const response = await axios.post("/api/admin/auth/login", demoCredentials)
+      
+      const { token, admin } = response.data
+      
+      if (!token || !admin) {
+        throw new Error("Invalid response from server")
+      }
+      
+      localStorage.setItem("admin_token", token)
+      
+      toast({
+        variant: "default",
+        title: "Demo Access Granted!",
+        description: `Welcome to the demo dashboard`,
+        duration: 3000,
+      })
+
+      setTimeout(() => {
+        router.push("/admin")
+      }, 1000)
+    } catch (error: any) {
+      console.error("Demo login error:", error);
+      toast({
+        variant: "destructive",
+        title: "Demo Login Failed",
+        description: "Unable to access demo account. Please try again.",
+        duration: 4000,
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Animated Background */}
@@ -303,6 +352,26 @@ export default function AdminLogin() {
                       </>
                     ) : (
                       "Sign In"
+                    )}
+                  </Button>
+
+                  {/* Demo Login Button */}
+                  <Button
+                    type="button"
+                    onClick={handleDemoLogin}
+                    className="w-full bg-white text-gray-900 font-semibold py-3 shadow-lg hover:bg-blue-500 hover:text-white transition-all duration-300"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Accessing Demo...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Try Demo Login
+                      </>
                     )}
                   </Button>
                 </form>
