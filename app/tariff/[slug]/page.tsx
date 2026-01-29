@@ -93,22 +93,12 @@ export default async function TariffDetailPage({ params }: { params: Promise<{ s
 // Generate static params for better performance (optional)
 export async function generateStaticParams() {
   try {
-    // Construct absolute URL for server-side fetching
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/tariff`, {
-      cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    // During build time, fetch directly from database instead of HTTP
+    const { default: connectDB } = await import('@/config/models/connectDB');
+    const { default: Tariff } = await import('@/config/utils/admin/tariff/tariffSchema');
     
-    if (!response.ok) {
-      console.error('Failed to fetch tariffs for static params');
-      return [];
-    }
-    
-    const data = await response.json();
-    const tariffs = data.success ? data.data : [];
+    await connectDB();
+    const tariffs = await Tariff.find({ isActive: true }).select('slug').lean();
     
     return tariffs.map((tariff: any) => ({
       slug: tariff.slug,

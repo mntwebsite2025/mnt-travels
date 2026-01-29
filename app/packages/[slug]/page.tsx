@@ -44,25 +44,14 @@ async function getPackageBySlug(slug: string) {
 // Generate static params for all packages
 export async function generateStaticParams() {
   try {
-    // Construct absolute URL for server-side fetching
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/packages`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    // During build time, fetch directly from database instead of HTTP
+    const { default: connectDB } = await import('@/config/models/connectDB');
+    const { default: Package } = await import('@/config/utils/admin/packages/packageSchema');
     
-    if (!response.ok) {
-      console.error('Failed to fetch packages for static params');
-      return [];
-    }
+    await connectDB();
+    const packages = await Package.find({ isActive: true }).select('slug').lean();
     
-    const result = await response.json();
-    if (!result.success) {
-      return [];
-    }
-    
-    return result.data.map((pkg: any) => ({
+    return packages.map((pkg: any) => ({
       slug: pkg.slug,
     }));
   } catch (error) {
