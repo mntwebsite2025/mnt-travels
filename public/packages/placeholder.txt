@@ -1,0 +1,21 @@
+# Package Images Directory
+
+This directory contains images for tour packages.
+
+## Structure:
+- `/packages/` - Main package images
+- `/packages/gallery/` - Gallery images for packages
+
+## Image Guidelines:
+- Main images: 800x600px recommended
+- Gallery images: 600x400px recommended
+- Formats: JPG, PNG, WebP
+- Max size: 5MB per image
+
+## Sample Images Needed:
+- ooty-main.jpg
+- kodai-main.jpg  
+- munnar-main.jpg
+- Gallery images in /gallery/ subfolder
+
+Note: Replace this file with actual package images.
