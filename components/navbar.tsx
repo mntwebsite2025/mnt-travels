@@ -244,6 +244,14 @@ function NavbarContent() {
                 <Phone className="h-4 w-4 mr-2" />
                 WhatsApp
               </Button>
+              {/* Try Demo Login Button */}
+              <Link href="/admin/login">
+                <Button
+                  className="bg-white text-gray-900 border border-gray-300 hover:bg-blue-500 hover:text-white hover:border-blue-500 px-4 xl:px-6 py-2 font-semibold text-sm xl:text-base transition-all duration-300 hover:shadow-lg hover:scale-105"
+                >
+                  Demo Login
+                </Button>
+              </Link>
             </div>
 
             {/* Mobile Menu Button - Responsive */}
@@ -324,6 +332,16 @@ function NavbarContent() {
                     <Phone className="h-4 w-4 mr-2" />
                     WhatsApp
                   </Button>
+                  
+                  {/* Try Demo Login Button - Mobile */}
+                  <Link href="/admin/login">
+                    <Button
+                      className="w-full bg-white text-gray-900 border border-gray-300 hover:bg-blue-500 hover:text-white hover:border-blue-500 py-2.5 sm:py-3 font-semibold text-sm sm:text-base transition-all duration-300 hover:shadow-lg"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Try Demo Login
+                    </Button>
+                  </Link>
                 </motion.div>
               </div>
             </motion.div>
